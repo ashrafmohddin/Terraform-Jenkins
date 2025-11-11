@@ -18,18 +18,31 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/ashrafmohddin/Terraform-Jenkins.git'
             }
         }
-        stage('Terraform init') {
+
+        stage('Terraform Init') {
             steps {
-                bat 'terraform init'
+                bat '''
+                    set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
+                    set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
+                    set AWS_DEFAULT_REGION=%AWS_DEFAULT_REGION%
+                    terraform init
+                '''
             }
         }
-        stage('Plan') {
+
+        stage('Terraform Plan') {
             steps {
-                bat 'terraform plan -out tfplan'
-                bat 'terraform show -no-color tfplan > tfplan.txt'
+                bat '''
+                    set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
+                    set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
+                    set AWS_DEFAULT_REGION=%AWS_DEFAULT_REGION%
+                    terraform plan -out tfplan
+                    terraform show -no-color tfplan > tfplan.txt
+                '''
             }
         }
-        stage('Apply / Destroy') {
+
+        stage('Apply or Destroy') {
             steps {
                 script {
                     if (params.action == 'apply') {
@@ -38,16 +51,24 @@ pipeline {
                             input message: "Do you want to apply the plan?",
                             parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
                         }
-
-                        bat 'terraform ${action} -input=false tfplan'
+                        bat '''
+                            set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
+                            set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
+                            set AWS_DEFAULT_REGION=%AWS_DEFAULT_REGION%
+                            terraform apply -input=false tfplan
+                        '''
                     } else if (params.action == 'destroy') {
-                        bat 'terraform ${action} --auto-approve'
+                        bat '''
+                            set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
+                            set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
+                            set AWS_DEFAULT_REGION=%AWS_DEFAULT_REGION%
+                            terraform destroy --auto-approve
+                        '''
                     } else {
                         error "Invalid action selected. Please choose either 'apply' or 'destroy'."
                     }
                 }
             }
         }
-
     }
 }
