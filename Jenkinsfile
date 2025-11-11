@@ -22,8 +22,8 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 bat '''
-                    set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
-                    set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
+                    set AWS_ACCESS_KEY_ID=%aws-access-key-id%
+                    set AWS_SECRET_ACCESS_KEY=%aws-secret-access-key%
                     set AWS_DEFAULT_REGION=%AWS_DEFAULT_REGION%
                     terraform init
                 '''
