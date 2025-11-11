@@ -1,11 +1,8 @@
-provider "aws" {
-    region = "eu-north-1"  
-}
+resource "aws_instance" "public_instance" {
+ ami           = var.ami
+ instance_type = var.instance_type
 
-resource "aws_instance" "foo" {
-  ami           = "ami-05fa00d4c63e32376" # eu-north-2
-  instance_type = "t2.micro"
-  tags = {
-      Name = "TF-Instance"
-  }
+ tags = {
+   Name = var.name_tag,
+ }
 }
